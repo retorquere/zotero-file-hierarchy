@@ -16,7 +16,7 @@
   "browserSupport": "gcsv",
   "priority": 100,
   "inRepository": false,
-  "lastUpdated": "2018-09-27 20:08:49"
+  "lastUpdated": "2018-09-27 22:45:02"
 }
 
 class Collections {
@@ -44,7 +44,7 @@ class Collections {
         return filename.replace(/[#%&{}\\<>\*\?\/\$!'":@]/g, '_');
     }
     path(coll) {
-        return (this.collections[coll.parent] ? this.path(this.collections[coll.parent]) : '') + '/' + this.clean(coll.name);
+        return (this.collections[coll.parent] ? this.path(this.collections[coll.parent]) : '') + this.clean(coll.name) + '/';
     }
     save(item) {
         const attachments = (item.itemType === 'attachment') ? [item] : (item.attachments || []);
@@ -58,8 +58,8 @@ class Collections {
                 (att.contentType === 'text/html' ? this.clean(att.filename.replace(/\.html?$/, '')) : null),
             ].filter(p => p).join('/');
             Zotero.write(`// subdir=${subdir}`);
-            for (const coll of (collections.length ? collections : [{ path: '/' }])) {
-                const path = `${coll.path.substr(1)}/${subdir}`;
+            for (const coll of (collections.length ? collections : [{ path: '' }])) {
+                const path = `${coll.path}${subdir}`;
                 this.saved[path] = this.saved[path] || {};
                 const parts = att.filename.split('.');
                 const ext = this.clean(parts.length > 1 ? ('.' + parts.pop()) : '');

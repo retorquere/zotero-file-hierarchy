@@ -32,7 +32,7 @@ class Collections {
   }
 
   path(coll) {
-    return (this.collections[coll.parent] ? this.path(this.collections[coll.parent]) : '') + '/' + this.clean(coll.name)
+    return (this.collections[coll.parent] ? this.path(this.collections[coll.parent]) : '') + this.clean(coll.name) + '/'
   }
 
   save(item) {
@@ -50,8 +50,8 @@ class Collections {
       ].filter(p => p).join('/')
       Zotero.write(`// subdir=${subdir}`)
 
-      for (const coll of (collections.length ? collections : [{ path: '/' }])) {
-        const path = `${coll.path.substr(1)}/${subdir}`
+      for (const coll of (collections.length ? collections : [{ path: '' }])) {
+        const path = `${coll.path}${subdir}`
         this.saved[path] = this.saved[path] || {}
 
         const parts = att.filename.split('.')
