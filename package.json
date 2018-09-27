@@ -4,7 +4,9 @@
   "description": "Export files according to collection organisation",
   "main": "File Hierarchy.js",
   "scripts": {
-    "start": "tsc --target ES2017 --moduleResolution node 'File Hierarchy.ts' && node header.js"
+    "start": "tsc --target ES2017 --moduleResolution node 'File Hierarchy.ts' && node header.js",
+    "test": "npm start && rm -rf 'My Library' && cp 'File Hierarchy.js'  ~/.BBTZ5TEST/zotero/translators/",
+    "push": "git add . && git commit -m update && git push"
   },
   "repository": {
     "type": "git",

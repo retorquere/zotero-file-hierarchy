@@ -2,6 +2,7 @@ declare const Zotero: any
 
 class Collections {
   private collections = {}
+  private saved = {}
 
   constructor() {
     let coll
@@ -31,29 +32,42 @@ class Collections {
   }
 
   path(coll) {
-    return (this.collections[coll.parent] ? this.path(this.collections[coll.parent]) + '/' : '') + this.clean(coll.name)
+    return (this.collections[coll.parent] ? this.path(this.collections[coll.parent]) : '') + '/' + this.clean(coll.name)
   }
 
   save(item) {
     const attachments = (item.itemType === 'attachment') ? [ item ] : (item.attachments || [])
     const collections = (item.collections || []).map(key => this.collections[key]).filter(coll => coll)
 
-    let prefix = 0
     for (const att of attachments) {
       if (!att.defaultPath) continue
-      if (prefix) att.filename = `${prefix}_${att.filename}`; prefix += 1
-      if (att.contentType === 'text/html') att.filename = `${this.clean(att.filename.replace(/\.html?$/, ''))}/${this.clean(att.filename)}` // assume text/html is snapshot
-      if (item.itemType !== 'attachment') att.filename = `${this.clean(item.title)}/${att.filename}`
+      const subdir = [
+        (item.itemType !== 'attachment' ? this.clean(item.title) : null),
 
-      if (collections.length) {
-        for (const coll of collections) {
-          att.saveFile(`${coll.path}/${att.filename}`, true)
-          Zotero.write(`${coll.path}/${att.filename}\n`)
+        /* assume text/html is snapshot */
+        (att.contentType === 'text/html' ? this.clean(att.filename.replace(/\.html?$/, '')) : null),
+
+      ].filter(p => p).join('/')
+      Zotero.write(`// subdir=${subdir}`)
+
+      for (const coll of (collections.length ? collections : [{ path: '/' }])) {
+        const path = `${coll.path.substr(1)}/${subdir}`
+        this.saved[path] = this.saved[path] || {}
+
+        const parts = att.filename.split('.')
+        const ext = this.clean(parts.length > 1 ? ('.' + parts.pop()) : '')
+        const basename = this.clean(parts.join('.'))
+        let postfix = 0
+
+        let filename = basename + ext
+        while (this.saved[filename]) {
+          filename = `${basename}_${++postfix}${ext}`
         }
+        this.saved[path][filename] = true
 
-      } else {
-        att.saveFile(att.filename, true)
-        Zotero.write(`${att.filename}\n`)
+        Zotero.debug(`saving to ${path}/${filename}\n`)
+        att.saveFile(`${path}/${filename}`, true)
+        Zotero.write(`${path}/${filename}\n`)
       }
     }
   }
