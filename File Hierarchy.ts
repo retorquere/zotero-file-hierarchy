@@ -39,6 +39,7 @@ class Collections {
     const collections = (item.collections || []).map(key => this.collections[key]).filter(coll => coll)
 
     for (const att of attachments) {
+      if (!att.defaultPath) continue
       if (att.contentType === 'text/html') att.filename = `${this.clean(att.filename.replace(/\.html?$/, ''))}/${this.clean(att.filename)}` // assume text/html is snapshot
       if (item.itemType !== 'attachment') att.filename = `${this.clean(item.title)}/${att.filename}`
 

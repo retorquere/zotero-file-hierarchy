@@ -16,7 +16,7 @@
   "browserSupport": "gcsv",
   "priority": 100,
   "inRepository": false,
-  "lastUpdated": "2018-09-27 18:32:57"
+  "lastUpdated": "2018-09-27 18:34:57"
 }
 
 class Collections {
@@ -49,6 +49,8 @@ class Collections {
         const attachments = (item.itemType === 'attachment') ? [item] : (item.attachments || []);
         const collections = (item.collections || []).map(key => this.collections[key]).filter(coll => coll);
         for (const att of attachments) {
+            if (!att.defaultPath)
+                continue;
             if (att.contentType === 'text/html')
                 att.filename = `${this.clean(att.filename.replace(/\.html?$/, ''))}/${this.clean(att.filename)}`; // assume text/html is snapshot
             if (item.itemType !== 'attachment')
