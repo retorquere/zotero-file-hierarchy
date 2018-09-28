@@ -19,7 +19,7 @@ const header = JSON.stringify({
   'browserSupport': 'gcsv',
   'priority': 100,
   'inRepository': false,
-  'lastUpdated': (new Date).toISOString().replace('T', ' ').replace(/\..*/, ''),
+  'lastUpdated': fs.statSync('File Hierarchy.ts').mtime.toISOString().replace('T', ' ').replace(/\..*/, ''),
 }, null, 2)
 
 fs.writeFileSync('File Hierarchy.js', header + '\n\n' + body)
