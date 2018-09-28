@@ -48,7 +48,6 @@ class Collections {
         (att.contentType === 'text/html' ? this.clean(att.filename.replace(/\.html?$/, '')) : null),
 
       ].filter(p => p).join('/')
-      Zotero.write(`// subdir=${subdir}`)
 
       for (const coll of (collections.length ? collections : [{ path: '' }])) {
         const path = `${coll.path}${subdir}`

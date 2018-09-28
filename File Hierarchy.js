@@ -16,7 +16,7 @@
   "browserSupport": "gcsv",
   "priority": 100,
   "inRepository": false,
-  "lastUpdated": "2018-09-28 14:11:51"
+  "lastUpdated": "2018-09-28 15:59:02"
 }
 
 class Collections {
@@ -57,7 +57,6 @@ class Collections {
                 /* assume text/html is snapshot */
                 (att.contentType === 'text/html' ? this.clean(att.filename.replace(/\.html?$/, '')) : null),
             ].filter(p => p).join('/');
-            Zotero.write(`// subdir=${subdir}`);
             for (const coll of (collections.length ? collections : [{ path: '' }])) {
                 const path = `${coll.path}${subdir}`;
                 this.saved[path] = this.saved[path] || {};
