@@ -42,7 +42,7 @@ class Collections {
     for (const att of attachments) {
       if (!att.defaultPath) continue
       const subdir = [
-        (item.itemType !== 'attachment' ? this.clean(item.title) : null),
+        // (item.itemType !== 'attachment' ? this.clean(item.title) : null),
 
         /* assume text/html is snapshot */
         (att.contentType === 'text/html' ? this.clean(att.filename.replace(/\.html?$/, '')) : null),

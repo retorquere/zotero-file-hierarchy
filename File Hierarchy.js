@@ -16,7 +16,7 @@
   "browserSupport": "gcsv",
   "priority": 100,
   "inRepository": false,
-  "lastUpdated": "2018-09-27 22:45:02"
+  "lastUpdated": "2018-09-28 14:11:51"
 }
 
 class Collections {
@@ -53,7 +53,7 @@ class Collections {
             if (!att.defaultPath)
                 continue;
             const subdir = [
-                (item.itemType !== 'attachment' ? this.clean(item.title) : null),
+                // (item.itemType !== 'attachment' ? this.clean(item.title) : null),
                 /* assume text/html is snapshot */
                 (att.contentType === 'text/html' ? this.clean(att.filename.replace(/\.html?$/, '')) : null),
             ].filter(p => p).join('/');
