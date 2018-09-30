@@ -1,10 +1,18 @@
+
 # zotero-file-hierarchy
 
-1. I download the file from [GitHub](https://raw.githubusercontent.com/retorquere/zotero-file-hierarchy/master/File%20Hierarchy.js). Then, move the .js file to your \[User home directory\]/Zotero/translators folder.
-2. restart Zotero.
-3. To run the export,
-   1. right-click the library
-   2. select "Export Library..."
-   3. "File Hierarchy" & "Export Files" & "OK"
-   4. Select the target location for the export under "Where" and Save.
+When installed in Zotero, this translator will allow exporting attachments of items in your Zotero Library or selected Collection as files organized in folders. The exported attachments (files) will be organized in folders which reflect the hierarchical structure of your selected Zotero Library/Collections.
 
+**How to install**
+1.  I download the [File Hierarchy.js](https://raw.githubusercontent.com/retorquere/zotero-file-hierarchy/master/File%20Hierarchy.js "File Hierarchy.js") 
+2. Move the File Hierarchy.js file to *[User home directory]/Zotero/translators* folder 
+3. Restart Zotero 
+
+**How to run**
+1. Select and right click your My Library or a collection 
+2. Select "Export Library…"
+3. Select format “File Hierarchy” and enable the checkbox for “Export Files”. Then click *OK*.
+4. Select the target location for the export under “Where” and Save.
+
+**Note to users:** 
+* Exported files will be duplicated if an item belongs to multiple collections
