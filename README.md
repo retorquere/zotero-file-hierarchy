@@ -5,7 +5,7 @@ When installed in Zotero, this translator will allow exporting attachments of it
 
 **How to install**
 1.  I download the [File Hierarchy.js](https://raw.githubusercontent.com/retorquere/zotero-file-hierarchy/master/File%20Hierarchy.js "File Hierarchy.js") 
-2. Move the File Hierarchy.js file to *[User home directory]/Zotero/translators* folder 
+2. Move the "File Hierarchy.js" file to "[User home directory]/Zotero/translators" folder 
 3. Restart Zotero 
 
 **How to run**
