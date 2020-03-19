@@ -19,6 +19,6 @@
   },
   "homepage": "https://github.com/retorquere/zotero-file-hierarchy#readme",
   "dependencies": {
-    "typescript": "^3.1.1"
+    "typescript": "^3.8.3"
   }
 }
