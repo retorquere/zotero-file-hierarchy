@@ -1,72 +1,66 @@
 declare const Zotero: any
+declare const OS: any
 
 class Collections {
-  private collections = {}
-  private saved = {}
+  private path: Record<string, string> = {}
+  private saved: Record<string, Record<string, boolean>> = {}
 
   constructor() {
     let coll
+
     while (coll = Zotero.nextCollection()) {
-      const key = (coll.primary ? coll.primary : coll).key
-
-      this.collections[key] = {
-        parent: coll.fields.parentKey,
-        name: coll.name,
-      }
+      this.register(coll)
     }
 
-    for (const key in this.collections) {
-      const coll = this.collections[key]
+    Zotero.debug('collections: ' + JSON.stringify(this.path))
+  }
 
-      if (coll.parent && !this.collections[coll.parent]) {
-        coll.parent = false
-      }
-      coll.path = this.path(coll)
+  private register(collection, path?: string) {
+    const key = (collection.primary ? collection.primary : collection).key
+    const children = collection.children || collection.descendents || []
+    const collections = children.filter(coll => coll.type === 'collection')
+    const name = this.clean(collection.name)
+
+    this.path[key] = path ? OS.Path.join(path, name) : name
+
+    for (collection of collections) {
+      this.register(collection, this.path[key])
     }
-
-    Zotero.debug('collections: ' + JSON.stringify(this.collections))
   }
 
   clean(filename) {
     return filename.replace(/[#%&{}\\<>\*\?\/\$!'":@]/g, '_')
   }
 
-  path(coll) {
-    return (this.collections[coll.parent] ? this.path(this.collections[coll.parent]) : '') + this.clean(coll.name) + '/'
+  split(filename) {
+    const dot = filename.lastIndexOf('.')
+    return (dot < 1 || dot === (filename.length - 1)) ? [ filename, '' ] : [ filename.substring(0, dot), filename.substring(dot) ]
   }
 
   save(item) {
     const attachments = (item.itemType === 'attachment') ? [ item ] : (item.attachments || [])
-    const collections = (item.collections || []).map(key => this.collections[key]).filter(coll => coll)
+    const collections = (item.collections || []).map(key => this.path[key]).filter(coll => coll)
 
     for (const att of attachments) {
       if (!att.defaultPath) continue
-      const subdir = [
-        // (item.itemType !== 'attachment' ? this.clean(item.title) : null),
 
-        /* assume text/html is snapshot */
-        (att.contentType === 'text/html' ? this.clean(att.filename.replace(/\.html?$/, '')) : null),
+      const [ base, ext ] = this.split(this.clean(att.filename))
+      const subdir = att.contentType === 'text/html' ? base : ''
 
-      ].filter(p => p).join('/')
+      for (const coll of collections) {
+        let path = [ coll, subdir, base ].filter(p => p).reduce((acc, p) => OS.Path.join(acc, p))
+        const original = `${path}${ext}`
+        this.saved[original] = this.saved[original] || {}
 
-      for (const coll of (collections.length ? collections : [{ path: '' }])) {
-        const path = `${coll.path}${subdir}`
-        this.saved[path] = this.saved[path] || {}
-
-        const parts = att.filename.split('.')
-        const ext = this.clean(parts.length > 1 ? ('.' + parts.pop()) : '')
-        const basename = this.clean(parts.join('.'))
+        let filename = original
         let postfix = 0
-
-        let filename = basename + ext
-        while (this.saved[filename]) {
-          filename = `${basename}_${++postfix}${ext}`
+        while (this.saved[original][filename]) {
+          filename = `${path}_${++postfix}${ext}`
         }
-        this.saved[path][filename] = true
+        this.saved[original][filename] = true
 
-        Zotero.debug(`saving to ${path}/${filename}\n`)
-        att.saveFile(`${path}/${filename}`, true)
-        Zotero.write(`${path}/${filename}\n`)
+        att.saveFile(filename, true)
+        Zotero.write(`${filename}\n`)
       }
     }
   }
