@@ -39,7 +39,8 @@ class Collections {
 
   save(item) {
     const attachments = (item.itemType === 'attachment') ? [ item ] : (item.attachments || [])
-    const collections = (item.collections || []).map(key => this.path[key]).filter(coll => coll)
+    let collections = (item.collections || []).map(key => this.path[key]).filter(coll => coll)
+    if (!collections.length) collections = [ '' ] // if the item is not in a collection, save it in the root.
 
     for (const att of attachments) {
       if (!att.defaultPath) continue
