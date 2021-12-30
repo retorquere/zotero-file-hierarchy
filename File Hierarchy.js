@@ -16,7 +16,7 @@
   "browserSupport": "gcsv",
   "priority": 100,
   "inRepository": false,
-  "lastUpdated": "2021-12-29 22:36:11"
+  "lastUpdated": "2021-12-30 00:40:30"
 }
 
 class Collections {
@@ -40,7 +40,7 @@ class Collections {
         }
     }
     clean(filename) {
-        return filename.replace(/[#%&{}\\<>\*\?\/\$!'":@]/g, '_');
+        return filename.replace(/[\x00-\x1F\x7F\/\\:*?"<>|$%]/g, encodeURIComponent);
     }
     split(filename) {
         const dot = filename.lastIndexOf('.');
@@ -57,13 +57,14 @@ class Collections {
             for (const coll of collections) {
                 let path = [coll, subdir, base].filter(p => p).reduce((acc, p) => OS.Path.join(acc, p));
                 const original = `${path}${ext}`;
-                this.saved[original] = this.saved[original] || {};
+                const lc_original = original.toLowerCase(); // deal with case insensitive file systems
+                this.saved[lc_original] = this.saved[lc_original] || {};
                 let filename = original;
                 let postfix = 0;
-                while (this.saved[original][filename]) {
+                while (this.saved[lc_original][filename]) {
                     filename = `${path}_${++postfix}${ext}`;
                 }
-                this.saved[original][filename] = true;
+                this.saved[lc_original][filename] = true;
                 att.saveFile(filename, true);
                 Zotero.write(`${filename}\n`);
             }
@@ -74,7 +75,7 @@ function doExport() {
     if (!Zotero.getOption('exportFileData'))
         throw new Error('File Hierarchy needs "Export File Data" to be on');
     const collections = new Collections;
-    let item, attachments;
+    let item;
     while ((item = Zotero.nextItem())) {
         collections.save(item);
     }
