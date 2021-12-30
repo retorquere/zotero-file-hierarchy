@@ -19,13 +19,17 @@ class Collections {
     debug('collections: ' + JSON.stringify(this.path))
   }
 
+  private join(...p: string[]) {
+    return p.filter(_ => _).join('/')
+  }
+
   private register(collection, path?: string) {
     const key = (collection.primary ? collection.primary : collection).key
     const children = collection.children || collection.descendents || []
     const collections = children.filter(coll => coll.type === 'collection')
     const name = this.clean(collection.name)
 
-    this.path[key] = path ? OS.Path.join(path, name) : name
+    this.path[key] = this.join(path, name)
 
     for (collection of collections) {
       this.register(collection, this.path[key])
@@ -53,7 +57,7 @@ class Collections {
       const subdir = att.contentType === 'text/html' ? base : ''
 
       for (const coll of collections) {
-        let path = [ coll, subdir, base ].filter(p => p).reduce((acc, p) => OS.Path.join(acc, p))
+        const path = this.join(coll, subdir, base)
 
         let filename = `${path}${ext}`
         let postfix = 0

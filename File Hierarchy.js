@@ -16,7 +16,7 @@
   "browserSupport": "gcsv",
   "priority": 100,
   "inRepository": false,
-  "lastUpdated": "2021-12-30 10:58:20"
+  "lastUpdated": "2021-12-30 13:05:34"
 }
 
 function debug(msg) {
@@ -32,12 +32,15 @@ class Collections {
         }
         debug('collections: ' + JSON.stringify(this.path));
     }
+    join(...p) {
+        return p.filter(_ => _).join('/');
+    }
     register(collection, path) {
         const key = (collection.primary ? collection.primary : collection).key;
         const children = collection.children || collection.descendents || [];
         const collections = children.filter(coll => coll.type === 'collection');
         const name = this.clean(collection.name);
-        this.path[key] = path ? OS.Path.join(path, name) : name;
+        this.path[key] = this.join(path, name);
         for (collection of collections) {
             this.register(collection, this.path[key]);
         }
@@ -60,7 +63,7 @@ class Collections {
             const [base, ext] = this.split(this.clean(att.filename));
             const subdir = att.contentType === 'text/html' ? base : '';
             for (const coll of collections) {
-                let path = [coll, subdir, base].filter(p => p).reduce((acc, p) => OS.Path.join(acc, p));
+                const path = this.join(coll, subdir, base);
                 let filename = `${path}${ext}`;
                 let postfix = 0;
                 while (this.saved[filename.toLowerCase()]) {
