@@ -1,9 +1,13 @@
 declare const Zotero: any
 declare const OS: any
 
+function debug(msg) {
+  Zotero.debug(`File hierarchy: ${msg}`)
+}
+
 class Collections {
   private path: Record<string, string> = {}
-  private saved: Record<string, Record<string, boolean>> = {}
+  private saved: Record<string, boolean> = {}
 
   constructor() {
     let coll
@@ -12,7 +16,7 @@ class Collections {
       this.register(coll)
     }
 
-    Zotero.debug('collections: ' + JSON.stringify(this.path))
+    debug('collections: ' + JSON.stringify(this.path))
   }
 
   private register(collection, path?: string) {
@@ -50,17 +54,15 @@ class Collections {
 
       for (const coll of collections) {
         let path = [ coll, subdir, base ].filter(p => p).reduce((acc, p) => OS.Path.join(acc, p))
-        const original = `${path}${ext}`
-        const lc_original = original.toLowerCase() // deal with case insensitive file systems
-        this.saved[lc_original] = this.saved[lc_original] || {}
 
-        let filename = original
+        let filename = `${path}${ext}`
         let postfix = 0
-        while (this.saved[lc_original][filename]) {
+        while (this.saved[filename.toLowerCase()]) {
           filename = `${path}_${++postfix}${ext}`
         }
-        this.saved[lc_original][filename] = true
+        this.saved[filename.toLowerCase()] = true
 
+        debug(JSON.stringify(filename))
         att.saveFile(filename, true)
         Zotero.write(`${filename}\n`)
       }
